@@ -291,14 +291,13 @@ def setup_banditlols(dy_model, learning_method):
         explore = stochastic(ExponentialAnnealing(explore))
         run_per_batch += [explore.step]
 
-    BLOLS = BanditLOLSMultiDev if 'multidev' in learning_method else \
+    BLOLS = Reslope if 'multidev' in learning_method else \
             BanditLOLS
     builder = (lambda reference, policy: \
-               BanditLOLSMultiDev(reference, policy, p_rollin_ref, p_rollout_ref,
+               Reslope(reference, policy, p_rollout_ref,
                                   update_method, exploration_method,
                                   temperature=temperature,
-                                  use_prefix_costs=use_prefix_costs, explore=explore,
-                                  offset_t=offset_t, no_certainty_tracker=not offset_t)
+                                  explore=explore)
                ) if 'multidev' in learning_method else \
               (lambda reference, policy: \
                BanditLOLS(reference, policy, p_rollin_ref, p_rollout_ref,
@@ -945,7 +944,7 @@ if __name__ == '__main__' and len(sys.argv) >= 2 and sys.argv[1] == '--sweep':
 #                                 s + '::greedy_predict',
                                  s + '::greedy_update::greedy_predict'
                                 ]
-                        
+
     all_settings += list(itertools.product(algs, tasks, opts, lrs))
 
     bases = ['blols::bootstrap::greedy_update::mtr::multidev::oft::upc',
@@ -982,9 +981,9 @@ if __name__ == '__main__' and len(sys.argv) >= 2 and sys.argv[1] == '--sweep':
         return len(diff) <= 1
     algs = [a for a in algs if any((one_difference(a, b) for b in bases))]
     all_settings += list(itertools.product(algs, tasks, opts, lrs))
-    
+
     all_settings = list(set(all_settings)) # nub
-    
+
     all_settings_arg_to_id = my_permutation(range(len(all_settings)))
     #all_settings_arg_to_id = range(len(all_settings))
 
@@ -1034,7 +1033,7 @@ if __name__ == '__main__' and len(sys.argv) >= 2 and sys.argv[1] == '--sweep':
     if 'bootstrap' not in alg or 'multidev' in alg:
         print 'not a singledev bootstrap, quitting'
         sys.exit(0)
-    
+
     bag_size = None
     if 'bootstrap' in alg:
         if   task == 'pos-wsj': embed, d_rnn, n_layers, p_layers, load, bag_size = 300, 300, 1, 2, DATA_DIR + 'data/adam_0.001_dagger_0.99999_pos-tweet_300_300_1_2_bootstrap_10_7.model', 10
@@ -1394,5 +1393,5 @@ Traceback (most recent call last):
     env.run_episode(learner)
   File "/home/hal/projects/macarico/macarico/tasks/dependency_parser.py", line 155, in run_episode
     assert self.a in self.actions, 'policy %s returned an invalid transition "%s" (must be one of %s)!' % (type(policy), self.a, self.actions)
-AssertionError: policy <class 'macarico.lts.lols.BanditLOLSMultiDev'> returned an invalid transition "0" (must be one of set([1, 2]))!
+AssertionError: policy <class 'macarico.lts.lols.Reslope'> returned an invalid transition "0" (must be one of set([1, 2]))!
 """
