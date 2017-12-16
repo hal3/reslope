@@ -26,6 +26,7 @@ from macarico.tasks.seq2seq import EditDistance, EditDistanceReference
 from macarico.features.sequence import RNNFeatures, BOWFeatures, AttendAt, DilatedCNNFeatures
 from macarico.features.actor import TransitionRNN, TransitionBOW
 from macarico.policies.bootstrap import BootstrapPolicy
+from macarico.policies.ensemble import EnsemblePolicy
 from macarico.policies.linear import LinearPolicy
 from macarico.policies.active import CSActive
 from macarico.lts.dagger import DAgger
@@ -270,6 +271,7 @@ def setup_banditlols(dy_model, learning_method):
       BanditLOLS.EXPLORE_BOLTZMANN if 'boltzmann' in learning_method else \
       BanditLOLS.EXPLORE_BOLTZMANN_BIASED if 'biasedboltz' in learning_method else \
       BanditLOLS.EXPLORE_BOOTSTRAP if 'bootstrap' in learning_method else \
+      BanditLOLS.EXPLORE_BOLTZMANN if 'ensemble' in learning_method else \
       None
     temperature = 1.0
     use_prefix_costs = 'upc' in learning_method
@@ -647,19 +649,34 @@ def run(task='mod::160::4::20', \
 
     bag_size = 5
     bootstrap = False
+    ensemble = False
     extra_args = learning_method.split('::') + additional_args
     sweep_id = None
     for x in extra_args:
         if x.startswith('bag_size='): bag_size = int(x[9:])
         if x == 'bootstrap': bootstrap = True
+        if x == 'ensemble': ensemble = True
         if x.startswith('sweep_id='): sweep_id = int(x[9:])
 
-    if not bootstrap:
+    if (not bootstrap) and (not ensemble):
         features = mk_feats(feature_builder, '')
         transition = transition_builder(dy_model, features, attention(features), n_labels, '')
         policy = LinearPolicy(dy_model, transition, n_labels, loss_fn='huber', n_layers=p_layers, hidden_dim=50)
         if active:
             policy = CSActive(policy)
+    elif (not bootstrap) and ensemble:
+        print('running ensemble')
+        all_transitions = []
+        for i in range(bag_size):
+            #offset_id = '%d' % i     # use this if you want each policy's feature set to be totally independent (uses lots of memory)
+            offset_id = '' # use this to keep underlying (embedding+lstm) features shared
+            features = mk_feats(feature_builder, offset_id)
+            transition = transition_builder(dy_model, features, attention(features), n_labels, '%d' % i)
+            all_transitions.append(transition)
+        policy = BootstrapPolicy(dy_model, all_transitions, n_labels,
+                                 loss_fn='huber',
+                                 n_layers=p_layers,
+                                 hidden_dim=hidden_dim)
     else:
         greedy_predict = 'greedy_predict' in extra_args
         greedy_update = 'greedy_update' in extra_args
