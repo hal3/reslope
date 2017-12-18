@@ -673,7 +673,7 @@ def run(task='mod::160::4::20', \
             features = mk_feats(feature_builder, offset_id)
             transition = transition_builder(dy_model, features, attention(features), n_labels, '%d' % i)
             all_transitions.append(transition)
-        policy = BootstrapPolicy(dy_model, all_transitions, n_labels,
+        policy = EnsemblePolicy(dy_model, all_transitions, n_labels,
                                  loss_fn='huber',
                                  n_layers=p_layers,
                                  hidden_dim=hidden_dim)
