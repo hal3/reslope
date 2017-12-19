@@ -666,6 +666,7 @@ def run(task='mod::160::4::20', \
             policy = CSActive(policy)
     elif (not bootstrap) and ensemble:
         print('running ensemble')
+        print('bag size: ', bag_size)
         all_transitions = []
         for i in range(bag_size):
             #offset_id = '%d' % i     # use this if you want each policy's feature set to be totally independent (uses lots of memory)
