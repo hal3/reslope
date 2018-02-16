@@ -1,13 +1,10 @@
 from __future__ import division
 import numpy as np
 import random
-import torch
 import sys
 import json
 import re
-import testutil
 from matplotlib.pyplot import *
-testutil.reseed()
 
 def bandit_curve(run):
     return np.array([x[0][0] / run['length'] for x in run['history']])
