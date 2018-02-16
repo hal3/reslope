@@ -666,6 +666,7 @@ def run(task='mod::160::4::20', \
             policy = CSActive(policy)
     elif (not bootstrap) and ensemble:
         print('running ensemble')
+        print('bag size: ', bag_size)
         all_transitions = []
         for i in range(bag_size):
             #offset_id = '%d' % i     # use this if you want each policy's feature set to be totally independent (uses lots of memory)
@@ -673,7 +674,7 @@ def run(task='mod::160::4::20', \
             features = mk_feats(feature_builder, offset_id)
             transition = transition_builder(dy_model, features, attention(features), n_labels, '%d' % i)
             all_transitions.append(transition)
-        policy = BootstrapPolicy(dy_model, all_transitions, n_labels,
+        policy = EnsemblePolicy(dy_model, all_transitions, n_labels,
                                  loss_fn='huber',
                                  n_layers=p_layers,
                                  hidden_dim=hidden_dim)
