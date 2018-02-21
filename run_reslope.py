@@ -842,8 +842,11 @@ if __name__ == '__main__' and len(sys.argv) >= 4 and sys.argv[1] != '--sweep':
 
 
 sweep_complete = set()
-for l in open(DATA_DIR + 'bandit_data/reslope_sweep_complete.txt'):
-    sweep_complete.add(l.strip())
+try:
+    for l in open(DATA_DIR + 'bandit_data/reslope_sweep_complete.txt'):
+        sweep_complete.add(l.strip())
+except IOError:
+    pass
 
 def my_permutation(A, seed=90210):
     _MULT, _ADD = 3819047, 94281731
@@ -998,8 +1001,8 @@ if __name__ == '__main__' and len(sys.argv) >= 2 and sys.argv[1] == '--sweep':
         #print a, b, len(diff), diff
         return len(diff) <= 1
     algs = [a for a in algs if any((one_difference(a, b) for b in bases))]
-    all_settings += list(itertools.product(algs, tasks, opts, lrs))
-
+    all_settings += list(itertools.product(algs, tasks, opts, lrs))    
+    
     all_settings = list(set(all_settings)) # nub
 
     all_settings_arg_to_id = my_permutation(range(len(all_settings)))
@@ -1048,9 +1051,9 @@ if __name__ == '__main__' and len(sys.argv) >= 2 and sys.argv[1] == '--sweep':
     alg, task, opt, lr = all_settings[sweep_id]
     #lr /= 10
 
-    if 'bootstrap' not in alg or 'multidev' in alg:
-        print 'not a singledev bootstrap, quitting'
-        sys.exit(0)
+    #if 'bootstrap' not in alg or 'multidev' in alg:
+    #    print 'not a singledev bootstrap, quitting'
+    #    sys.exit(0)
 
     bag_size = None
     if 'bootstrap' in alg:
