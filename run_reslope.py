@@ -378,6 +378,7 @@ def setup_ppo(dy_model, learning_method):
         elif x.startswith('m='): m = int(x[2:])
         else: assert '=' not in x, 'unknown arg: ' + x
     baseline = EWMA(baseline)
+    assert(m <= n)
     return lambda _, policy: \
         PPO(policy, baseline, epsilon, temperature=temp, only_one_deviation=only_one_deviation, k=k, n=n, m=m), \
         []
