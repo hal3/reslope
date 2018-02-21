@@ -364,16 +364,23 @@ def setup_ppo(dy_model, learning_method):
     baseline = 0.8
     epsilon = 0.1
     temp = 1.0
+    k = 1
+    n = 1
+    m = 1
     only_one_deviation = False
     for x in learning_method:
         if   x.startswith('baseline='): baseline = float(x[9:])
         elif x.startswith('epsilon='): epsilon = float(x[8:])
         elif x.startswith('temp='): temp = float(x[5:])
         elif x == 'maxd=1': only_one_deviation = True
+        elif x.startswith('k='): k = int(x[2:])
+        elif x.startswith('n='): n = int(x[2:])
+        elif x.startswith('m='): m = int(x[2:])
         else: assert '=' not in x, 'unknown arg: ' + x
     baseline = EWMA(baseline)
+    assert(m <= n)
     return lambda _, policy: \
-        PPO(policy, baseline, epsilon, temperature=temp, only_one_deviation=only_one_deviation), \
+        PPO(policy, baseline, epsilon, temperature=temp, only_one_deviation=only_one_deviation, k=k, n=n, m=m), \
         []
 
 def setup_dagger(dy_model, learning_method):
