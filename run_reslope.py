@@ -279,11 +279,20 @@ def setup_banditlols(dy_model, learning_method):
     p_rin = 0.
     p_rout = 0.
     explore = 1.
+
+    k = None
+    n = None
+    m = None
     for x in learning_method:
         if   x.startswith('p_rin='): p_rin = float(x[6:])
         elif x.startswith('p_rout='): p_rout = float(x[7:])
         elif x.startswith('temp='): temperature = float(x[5:])
         elif x.startswith('explore='): explore = float(x[8:])
+        elif x.startswith('k='): k = int(x[2:])
+        elif x.startswith('n='): n = int(x[2:])
+        elif x.startswith('m='): m = int(x[2:])
+
+    assert(m <= n)
         #else: assert '=' not in x, 'unknown arg: ' + x
 
     p_rollin_ref  = stochastic(ExponentialAnnealing(p_rin))
@@ -299,7 +308,10 @@ def setup_banditlols(dy_model, learning_method):
                Reslope(reference, policy, p_rollout_ref,
                                   update_method, exploration_method,
                                   temperature=temperature,
-                                  explore=explore)
+                                  explore=explore,
+                                  k=k,
+                                  n=n,
+                                  m=m)
                ) if 'multidev' in learning_method else \
               (lambda reference, policy: \
                BanditLOLS(reference, policy, p_rollin_ref, p_rollout_ref,
