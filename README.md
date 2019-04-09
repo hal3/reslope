@@ -1,7 +1,7 @@
 # Residual Loss Prediction: Reinforcement Learning with No Incremental Feedback
 
 
-An implemntation for our [paper](https://openreview.net/pdf?id=HJNMYceCW): residual loss prediction: reinforcement learning with no intermediate feedback. If you find this code useful in your research, please consider citing:
+An implementation for our [paper](https://openreview.net/pdf?id=HJNMYceCW): residual loss prediction: reinforcement learning with no incremental feedback. If you find this code useful in your research, please consider citing:
 
         @article{daume2018residual,
           title={Residual Loss Prediction: Reinforcement Learning With No Incremental Feedback},
