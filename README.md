@@ -15,10 +15,20 @@ To run:
 
         python run_reslope.py grid::0.05::0.9::0.99 blols::mtr::multidev::bootstrap adam 0.01 bag_size=3 --dynet-seed 3
         
-This command will run relope on the grid world enviroment with the following parameters:
+This command will run reslope on the grid world environment with the following parameters:
 
-1) Run relope in multiple deviation model
+1) Run reslope in multiple deviation mode
 2) Use Multi-task regression (MTR) contextual bandit oracle, MTR reduces contextual bandit costs directly to importance-weighted regression.
-3) Use bootrap exploration for the contexual bandit oracle with a bag size of three policies.
+3) Use bootstrap exploration for the contexual bandit oracle with a bag size of three policies.
 
 The code has a dependency on the macarico github repo, and the dynet branch is required to run this code base.
+
+## Examples
+
+This command will run the reinforce algorithm on the blackjack environment:
+
+        python run_reslope.py blackjack reinforce adam 0.01 --dynet-seed 90210
+        
+This command will run the PPO algorithm on the cartpole enviroment:
+
+        python run_reslope.py cartpole ppo::k=3::n=20::m=1 adam 0.01 --dynet-seed 3
